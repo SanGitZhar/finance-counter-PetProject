@@ -1,7 +1,9 @@
 from datetime import datetime
+from decimal import Decimal
 from fastapi import HTTPException
 from sqlalchemy.orm import Session
 
+from app.enum import OperationType
 from app.models import User
 from app.database import SessionLocal
 #Import models to operate with money
@@ -9,6 +11,7 @@ from app.schemas import OperationRequest, OperationResponse
 #Import repository to work with wallets
 from app.repository import wallets as wallets_repository
 from app.repository import operations as operations_repository
+from app.service.exchange_service import get_exchange_rate
 
 
 def add_income(db: Session, current_user: User, operation: OperationRequest) -> OperationResponse:
@@ -23,7 +26,7 @@ def add_income(db: Session, current_user: User, operation: OperationRequest) -> 
     operation = operations_repository.create_operation(
          db=db,
          wallet_id=wallet.id,
-         type="income",
+         type=OperationType.INCOME,
          amount=operation.amount,
          currency=wallet.currency,
          category=operation.description,
@@ -51,7 +54,7 @@ def add_expense(db: Session, current_user: User, operation: OperationRequest) ->
     operation = operations_repository.create_operation(
          db=db,
          wallet_id=wallet.id,
-         type="expense",
+         type=OperationType.EXPENSE,
          amount=operation.amount,
          currency=wallet.currency,
          category=operation.description,
@@ -91,3 +94,44 @@ def get_operations_list(
     for operation in operations:
         result.append(OperationResponse.model_validate(operation))
     return result
+
+def transfer_between_wallets(
+        db: Session, user_id: int, from_wallet_id: int, to_wallet_id: int, amount: Decimal,        
+) -> OperationResponse:
+    from_wallet = wallets_repository.get_wallet_by_id(db, from_wallet_id, user_id) #Проверить, я не поменял местами
+    to_wallet = wallets_repository.get_wallet_by_id(db, to_wallet_id, user_id)
+
+    if not from_wallet or not to_wallet:
+        raise HTTPException(status_code=404, detail="wallet not Found")
+    
+    if from_wallet.balance < amount:
+        raise HTTPException(
+            status_code=400,
+            detail=f"Not enough money: {from_wallet.balance} {from_wallet.currency}"
+        )
+    
+    target_amount = amount
+    exchange_rate = 1.0
+    if from_wallet.currency != to_wallet.currency:
+        exchange_rate = get_exchange_rate(
+            from_wallet.currency, to_wallet.currency
+        )
+        target_amount = round(amount * exchange_rate, 2)
+
+    from_wallet.balance = round(from_wallet.balance - amount, 2)
+    to_wallet.balance = round(to_wallet.balance + target_amount, 2)
+    operation = operations_repository.create_operation(
+        db=db,
+        wallet_id=from_wallet.id,
+        type=OperationType.TRANSFER,
+        amount=target_amount,
+        currency=from_wallet.currency,
+        category="tranfer",
+    )
+    db.add(from_wallet)
+    db.add(to_wallet)
+    db.add(operation)
+    db.commit() #Save
+    return OperationResponse.model_validate(operation)
+    
+    
