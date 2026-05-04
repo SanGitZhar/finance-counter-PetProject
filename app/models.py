@@ -36,3 +36,11 @@ class Operation(Base):
     category: Mapped[str | None] = mapped_column(default=None)
     subcategory: Mapped[str | None] = mapped_column(default=None)
     created_at: Mapped[datetime] = mapped_column(default=lambda: datetime.now())
+
+class Category(Base):
+
+    __tablename__ = "category"
+
+    id: Mapped[int] = mapped_column(primary_key=True)
+    name: Mapped[str]
+    user_id: Mapped[int] = mapped_column(ForeignKey("user.id"))

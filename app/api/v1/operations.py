@@ -37,3 +37,4 @@ async def create_transfer(
     db: Session = Depends(get_db),
 ): 
     return await operations_service.transfer_between_wallets(db, user.id, payload.from_wallet_id, payload.to_wallet_id, payload.amount)
+

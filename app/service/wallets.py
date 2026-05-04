@@ -20,7 +20,7 @@ async def get_total_balance(db: Session, current_user: User) -> TotalBalance:
         else: 
             exchange_rate = await exchange_service.get_exchange_rate(wallet.currency, CurrencyEnum.RUB)
 
-            total_balance += exchange_service * wallet.balance
+            total_balance += exchange_rate * wallet.balance
     return TotalBalance(total_balance = total_balance)
 
 
