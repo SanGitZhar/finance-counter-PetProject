@@ -1,7 +1,7 @@
 from decimal import Decimal
 from datetime import datetime
 from sqlalchemy.orm import Mapped, mapped_column
-from sqlalchemy import ForeignKey
+from sqlalchemy import ForeignKey, UniqueConstraint
 
 from app.database import Base
 from app.enum import CurrencyEnum
@@ -44,3 +44,7 @@ class Category(Base):
     id: Mapped[int] = mapped_column(primary_key=True)
     name: Mapped[str]
     user_id: Mapped[int] = mapped_column(ForeignKey("user.id"))
+
+    __table_args__ = (
+        UniqueConstraint("user_id", "name", name="uq_user_category"),
+    )
