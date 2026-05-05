@@ -2,9 +2,8 @@ from datetime import datetime
 from fastapi import APIRouter, Depends, Query
 from sqlalchemy.orm import Session
 
-from app.dependency import get_db
+from app.dependency import get_db, get_current_user
 from app.models import User
-from app.dependency import get_current_user
 from app.schemas import OperationRequest, OperationResponse, TransferCreateSchema
 from app.service import operations as operations_service
 
@@ -37,4 +36,5 @@ async def create_transfer(
     db: Session = Depends(get_db),
 ): 
     return await operations_service.transfer_between_wallets(db, user.id, payload.from_wallet_id, payload.to_wallet_id, payload.amount)
+
 

@@ -126,7 +126,7 @@ async def transfer_between_wallets(
         type=OperationType.TRANSFER,
         amount=target_amount,
         currency=to_wallet.currency,
-        category="tranfer",
+        category=4,
     )
      
     db.add(from_wallet)

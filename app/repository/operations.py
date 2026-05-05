@@ -12,7 +12,7 @@ def create_operation(
         type: str,
         amount: Decimal,
         currency: CurrencyEnum,
-        category: str | None = None,
+        category: int | None = None,
         subcategory: str | None = None
 ) -> Operation:
     operation = Operation(
@@ -40,6 +40,8 @@ def get_operation_list(
 
     if date_to:
         query = query.filter(Operation.created_at <= date_from)
+    
+    
 
     return query.all()
 

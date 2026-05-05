@@ -1,10 +1,10 @@
 from decimal import Decimal
 from sqlalchemy.orm import Session
 
-from app.models import User
 from app.database import SessionLocal
-from app.models import Wallet
+from app.models import Wallet, User
 from app.enum import CurrencyEnum
+
 
 def is_wallet_exist(db: Session, user_id: int, wallet_name: str) -> bool:
     return db.query(Wallet).filter(Wallet.name == wallet_name, Wallet.user_id == user_id).first() is not None

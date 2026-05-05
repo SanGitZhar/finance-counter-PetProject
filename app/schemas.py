@@ -7,7 +7,7 @@ from app.enum import CurrencyEnum
 class OperationRequest(BaseModel):
     wallet_name: str = Field(..., max_length=127)
     amount: Decimal
-    description: str | None = Field(None, max_length=255)
+    description: int 
 
     @field_validator('amount')
     def amount_must_be_positive(cls, v:Decimal) -> Decimal:
@@ -91,3 +91,20 @@ class TransferCreateSchema(BaseModel):
     
 class TotalBalance(BaseModel):
     total_balance: Decimal
+
+
+class CategoryReponse(BaseModel):
+    
+    id: int
+    name: str | None
+    user_id: int
+
+class CreateCategoryRequest(BaseModel):
+    name: str = Field(..., max_length=63)
+
+    @field_validator("name")
+    def category_name_not_empty(cls, v:str) -> str:
+        v = v.strip()
+        if not v:
+            raise ValueError("category name can not be empty")
+        return v

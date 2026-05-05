@@ -33,7 +33,7 @@ class Operation(Base):
     type: Mapped[str]
     amount: Mapped[Decimal]
     currency: Mapped[CurrencyEnum]
-    category: Mapped[str | None] = mapped_column(default=None)
+    category: Mapped[int | None] = mapped_column(ForeignKey("category.id"))
     subcategory: Mapped[str | None] = mapped_column(default=None)
     created_at: Mapped[datetime] = mapped_column(default=lambda: datetime.now())
 
