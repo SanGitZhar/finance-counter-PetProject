@@ -11,9 +11,10 @@ def create_category(db: Session, current_user: User, category: CreateCategoryReq
     db.commit()
     return CategoryReponse.model_validate(category)
 
-    #создать проверку на наличие в репозитории и вызвать
+    
     
 
 def get_all_categories(db: Session, current_user:User) -> list[CategoryReponse]:
+    #создать проверку на наличие в репозитории и вызвать
     categories = category_repository.get_all_categories(db, current_user.id)
     return [CategoryReponse.model_validate(category) for category in categories]

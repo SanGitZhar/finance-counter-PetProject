@@ -94,6 +94,7 @@ class TotalBalance(BaseModel):
 
 
 class CategoryReponse(BaseModel):
+    model_config = {"from_attributes": True}
     
     id: int
     name: str | None
