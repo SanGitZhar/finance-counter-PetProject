@@ -64,7 +64,7 @@ class OperationResponse(BaseModel):
     type: str
     amount: Decimal
     currency: CurrencyEnum
-    category: str | None
+    category: int | None
     subcategory: str | None
     created_at: datetime
 
